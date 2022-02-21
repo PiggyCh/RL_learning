@@ -1,5 +1,6 @@
 ## RL MC with exploring starts for gym Blackjack (gym 0.22.0)
 import gym
+import gym
 import time
 import random
 import numpy as np
@@ -22,13 +23,16 @@ def MC_evaluation_update(data,Q_table,iteration_Q):#这里为了避免记录每�
         iteration_Q[index]+=1 #迭代次数加1
         Q_table[index]+=(1/iteration_Q[index])*( Q_table[index]-G) #迭代式 Q<-Q+1/k(Q-G)
     return Q_table,iteration_Q
-def sample_data(env,Q_table):
+def sample_data(env,Q_table,random_policy=False):
     obs,reward,actions=[],[],[]
     observation = env.reset()
     obs.append(observation)
     done = False
     while not done:
-        action = greedy_policy(Q_table,observation)
+        if random_policy:
+            action=random.randint(0,1)
+        else:
+            action = greedy_policy(Q_table,observation)
         observation,r,done,_ = env.step(action)
         if not done:
             obs.append(observation)
@@ -36,7 +40,7 @@ def sample_data(env,Q_table):
         reward.append(r)
     return {'obs':obs,
             'actions':actions,
-            'rewards',reward}
+            'rewards':reward}
 def training(env,iteration_time=50000):
     obs_space=env.observation_space
     action_space=env.action_space
@@ -48,7 +52,7 @@ def training(env,iteration_time=50000):
         data = sample_data(env,Q_table)
         Q_table,iteration_Q = MC_evaluation_update(data,Q_table,iteration_Q)
     return Q_table
-def testing(Q_table,random_policy=False,testing_time=20000):
+def testing(Q_table,random_policy=False,testing_time=30000):
     win,draw,lose=0,0,0
     for i in range(testing_time):
         data = sample_data(env,Q_table,random_policy)
@@ -63,3 +67,4 @@ def testing(Q_table,random_policy=False,testing_time=20000):
 Q_table=training(env,iteration_time=400000)
 testing(Q_table)
 testing(Q_table,random_policy=True)
+
