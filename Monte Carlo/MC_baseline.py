@@ -22,16 +22,13 @@ def MC_evaluation_update(data,Q_table,iteration_Q):#这里为了避免记录每�
         iteration_Q[index]+=1 #迭代次数加1
         Q_table[index]+=(1/iteration_Q[index])*( Q_table[index]-G) #迭代式 Q<-Q+1/k(Q-G)
     return Q_table,iteration_Q
-def sample_data(env,Q_table,random_policy=False):
+def sample_data(env,Q_table):
     obs,reward,actions=[],[],[]
     observation = env.reset()
     obs.append(observation)
     done = False
     while not done:
-        if random_policy:
-            action=random.randint(0,1)
-        else:
-            action = greedy_policy(Q_table,observation)
+        action = greedy_policy(Q_table,observation)
         observation,r,done,_ = env.step(action)
         if not done:
             obs.append(observation)
@@ -39,7 +36,7 @@ def sample_data(env,Q_table,random_policy=False):
         reward.append(r)
     return {'obs':obs,
             'actions':actions,
-            'rewards':reward}
+            'rewards',reward}
 def training(env,iteration_time=50000):
     obs_space=env.observation_space
     action_space=env.action_space
