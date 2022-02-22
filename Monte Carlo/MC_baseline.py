@@ -1,4 +1,5 @@
 ## RL MC with exploring starts for gym Blackjack (gym 0.22.0)
+## RL MC with exploring starts for gym Blackjack (gym 0.22.0)
 import gym
 import gym
 import time
@@ -19,9 +20,9 @@ def MC_evaluation_update(data,Q_table,iteration_Q):#这里为了避免记录每�
         G= G*gamma + rewards[i]
         if obs[i] in obs[:i] and actions[i] in actions[:i]: #首次访问 ，只记录第一次
             continue
-        index= (obs[i][0],obs[i][1],obs[i][2],actions[i]) #操作的索引值
+        index= (obs[i][0],obs[i][1],int(obs[i][2]),actions[i]) #操作的索引值
         iteration_Q[index]+=1 #迭代次数加1
-        Q_table[index]+=(1/iteration_Q[index])*( Q_table[index]-G) #迭代式 Q<-Q+1/k(Q-G)
+        Q_table[index]+=(1/iteration_Q[index])*(G-Q_table[index]) #迭代式 Q<-Q+1/k(Q-G)
     return Q_table,iteration_Q
 def sample_data(env,Q_table,random_policy=False):
     obs,reward,actions=[],[],[]
@@ -64,7 +65,8 @@ def testing(Q_table,random_policy=False,testing_time=30000):
             draw+=1
     print('win: '+str(win)+' lose: '+str(lose)+' draw game: ' +str(draw))
     print('win_rate: '+str(win/testing_time)[:4]+' lose_rate: '+str(lose/testing_time)[:4]+' draw_rate: '+str(draw/testing_time)[:4])
-Q_table=training(env,iteration_time=400000)
+Q_table=training(env,iteration_time=100000)
+data_1,data_2=Q_table[:,:,0,0],Q_table[:,:,0,1]
+data_3, data_4 = Q_table[:, :, 1, 0], Q_table[:, :, 1, 1]
 testing(Q_table)
 testing(Q_table,random_policy=True)
-
